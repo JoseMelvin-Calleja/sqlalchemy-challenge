@@ -39,6 +39,19 @@ def homepage():
 
 @app.route('/api/v1.0/precipitation')
 def precipitation():
+    max_date = session.query(func.max(measurement.date))
+    for dates in max_date:
+        recent_date = dt.datetime.strptime(dates[0], '%Y-%m-%d')
+    one_year_ago = recent_date - dt.timedelta(days = 365)
+
+    session = Session(engine)
+
+    results = session.query(measurement.date, measurement.prcp).\
+                    filter(measurement.date >= one_year_ago).all()
+    
+    session.close()
+
+    return jsonify(results)
 
 @app.route('/api/v1.0/stations')
 def stations():
